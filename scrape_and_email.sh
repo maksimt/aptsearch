@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/bin/sh
+export PATH="/Users/Leo/anaconda3/bin:$PATH"
 
 # Remove output file if exists:
-[ -e aptscrape/good_stuff.json ] && rm aptscrape/good_stuff.json
+[ -e /Users/Leo/projects/aptsearch/aptscrape/good_stuff.json ] && rm /Users/Leo/projects/aptsearch/aptscrape/good_stuff.json
 
-cd aptscrape
-scrapy crawl scrapeapts -o good_stuff.json
+cd /Users/Leo/projects/aptsearch/aptscrape
+scrapy crawl scrapeapts -o /Users/Leo/projects/aptsearch/aptscrape/good_stuff.json
 
-cd ..
-python email_me.py
+cd /Users/Leo/projects/aptsearch
+python /Users/Leo/projects/aptsearch/email_me.py

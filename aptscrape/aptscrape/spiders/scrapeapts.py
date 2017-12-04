@@ -43,7 +43,7 @@ class ScrapecontentsSpider(CrawlSpider):
     )
 
     def parse_content_list(self, response):
-        print('\n\n')
+        # print('\n\n')
         self.logger.info('NOW CRAWLING THE FOLLOWING PAGE: {url}'.format(url=response.url))
         contents = response.xpath("//p[@class='result-info']")
         
@@ -71,25 +71,26 @@ class ScrapecontentsSpider(CrawlSpider):
                     contact_soup = BeautifulSoup(contact_html, 'lxml')
                     item['contact_email'] = contact_soup.find("p", {"class":"reply-email-address"}).find("a").get("href").replace('mailto:','').split('?')[0]
                 except:
-                    print("\n\CAPTCHA'D! You are a robot and can't prove otherwise :(")
+                    pass
+                    # print("\n\CAPTCHA'D! You are a robot and can't prove otherwise :(")
 
                 if self.meets_conditions(item=item):
                     interest_list.append(item)
             
             except Exception as e:
-                traceback.print_exc(file=sys.stdout)
+                # traceback.print_exc(file=sys.stdout)
                 item['exception'] = e
             
-            print('\n')
-            print(item)
-            print('\n')
+            # print('\n')
+            # print(item)
+            # print('\n')
             time.sleep(1)
 
         return interest_list
 
     def meets_conditions(self, item):
-        if int(item['price']) < 3000 and float(item['miles_from_work']) < 15:
-            print('\nFOUND ONE!')
+        if int(item['price']) < 10000 and float(item['miles_from_work']) < 25:
+            # print('\nFOUND ONE!')
             return True
         else:
             return False
