@@ -20,8 +20,6 @@ class CraigslistItem(scrapy.Item):
     price = scrapy.Field()
     hood = scrapy.Field()
     listing_url = scrapy.Field()
-    latitude = scrapy.Field()
-    longitude = scrapy.Field()
     miles_from_work = scrapy.Field()
     exception = scrapy.Field()
     contact_email = scrapy.Field()
@@ -60,9 +58,9 @@ class ScrapecontentsSpider(CrawlSpider):
 
                 listing_html = requests.get(item['listing_url']).text
                 soup = BeautifulSoup(listing_html, 'lxml')
-                item['latitude'] = soup.find("div", {"class":"viewposting"}).get("data-latitude")
-                item['longitude'] = soup.find("div", {"class":"viewposting"}).get("data-longitude")
-                item['miles_from_work'] = vincenty(work_lat_long, (item['latitude'], item['longitude'])).miles
+                latitude = soup.find("div", {"class":"viewposting"}).get("data-latitude")
+                longitude = soup.find("div", {"class":"viewposting"}).get("data-longitude")
+                item['miles_from_work'] = vincenty(work_lat_long, (latitude, longitude)).miles
                 
                 try:
                     reply_ext = soup.find("span", {"class":"replylink"}).find("a").get("href")
@@ -72,25 +70,28 @@ class ScrapecontentsSpider(CrawlSpider):
                     item['contact_email'] = contact_soup.find("p", {"class":"reply-email-address"}).find("a").get("href").replace('mailto:','').split('?')[0]
                 except:
                     pass
-                    # print("\n\CAPTCHA'D! You are a robot and can't prove otherwise :(")
 
                 if self.meets_conditions(item=item):
+                    with open('/Users/Leo/projects/aptsearch/title_list.txt', 'a') as title_list:
+                        title_list.write(item['title'] + '\n')
                     interest_list.append(item)
             
             except Exception as e:
-                # traceback.print_exc(file=sys.stdout)
                 item['exception'] = e
-            
-            # print('\n')
-            # print(item)
-            # print('\n')
-            time.sleep(1)
+
+            time.sleep(0.5)
 
         return interest_list
 
     def meets_conditions(self, item):
-        if int(item['price']) < 10000 and float(item['miles_from_work']) < 25:
-            # print('\nFOUND ONE!')
+        # Check if already found
+        with open('/Users/Leo/projects/aptsearch/title_list.txt') as title_list:
+            titles = title_list.readlines()
+        titles = [title.replace('\n','') for title in titles]
+        if item['title'] in titles:
+            return Falseå
+
+        if int(item['price']) < 1500 and float(item['miles_from_work']) < 5:
             return True
         else:
             return False
